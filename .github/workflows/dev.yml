@@ -35,7 +35,7 @@ jobs:
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       - name: Build Bicep File
-        run: az bicep build --file main.bicep
+        run: az bicep build --file ./main.bicep
 
       - name: What-If Deployment
         run: |
