@@ -35,13 +35,13 @@ jobs:
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       - name: Build Bicep File
-        run: az bicep build --file main.bicep
+        run: az bicep build --file cnovate-azure-infra/main.bicep
 
       - name: What-If Deployment
         run: |
           az deployment sub what-if \
             --location eastus \
-            --template-file main.bicep \
+            --template-file cnovate-azure-infra/main.bicep \
             --parameters @$PARAM_FILE
   securityScan:
     name: Security Scan (Checkov)
@@ -59,7 +59,7 @@ jobs:
       - name: Run Checkov Scan
         uses: bridgecrewio/checkov-action@v12.1347.0
         with:
-          directory: ./main.bicep
+          directory: ./cnovate-azure-infra/main.bicep
           framework: bicep
           soft_fail: false
           output_format: sarif
