@@ -9,7 +9,7 @@
           "app": "idiscovery",
           "env": "dev",
           "region": "eastus",
-          "instance": "01",
+          "instance": "02",
           "location": "eastus",
           "managedBy": "PlatformTeam",
           "tags": {
