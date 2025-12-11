@@ -9,7 +9,7 @@ on:
 
 env:
   ENV_NAME: ${{ github.ref_name }}
-  PARAM_FILE: ${{ github.ref_name == 'main' && 'parameters/prod.json' || format('parameters/{0}.json', github.ref_name) }}
+  PARAM_FILE: parameters/${{ github.ref_name }}.json
 
 jobs:
 
