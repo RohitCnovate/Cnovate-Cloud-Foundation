@@ -1,0 +1,71 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+
+    "resourceGroups": {
+      "value": [
+        {
+          "app": "idiscovery",
+          "env": "dev",
+          "region": "eastus",
+          "instance": "01",
+          "location": "eastus",
+          "managedBy": "PlatformTeam",
+          "tags": {
+            "app": "idiscovery",
+            "tier": "web",
+            "env": "dev"
+          }
+        }
+      ]
+    },
+
+    "stgConfigs": {
+      "value": [
+        {
+          "project": "idiscovery",
+          "env": "dev",
+          "region": "eastus",
+          "instance": "01",
+          "location": "eastus",
+          "skuName": "Standard_LRS",
+          "kind": "StorageV2",
+          "accessTier": "Hot",
+          "minimumTlsVersion": "TLS1_2",
+          "enableCMK": true,
+
+          "keyVaultUri": "https://kvidiscoverydeveastus01.vault.azure.net/",
+          "keyName": "cmk-data-key",
+          "keyVersion": "",
+
+          "resourceGroupIndex": 0,
+          "uamiIndex": 0,
+
+          "tags": {
+            "env": "dev",
+            "owner": "teamA"
+          }
+        }
+      ]
+    },
+
+    "keyVaultName": { "value": "kvidiscoverydeveastus01" },
+    "cmkKeyName": { "value": "cmk-data-key" },
+    "keyVaultSku": { "value": "standard" },
+ 
+
+    "uamiConfigs": {
+      "value": [
+        {
+          "project": "idiscovery",
+          "env": "dev",
+          "region": "eastus",
+          "instance": "01",
+          "resourceType": "storage",
+          "resourceGroupIndex": 0
+        }
+      ]
+    }
+  }
+}
