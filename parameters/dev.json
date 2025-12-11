@@ -9,7 +9,7 @@
           "app": "idiscovery",
           "env": "dev",
           "region": "eastus",
-          "instance": "01",
+          "instance": "02",
           "location": "eastus",
           "managedBy": "PlatformTeam",
           "tags": {
@@ -27,11 +27,7 @@
           "project": "idiscovery",
           "env": "dev",
           "region": "eastus",
-<<<<<<< HEAD
-          "instance": "05",
-=======
           "instance": "01",
->>>>>>> 98a27ac38bec5fde0bb797f7aebf6293bc32e1aa
           "location": "eastus",
           "skuName": "Standard_LRS",
           "kind": "StorageV2",
@@ -65,11 +61,9 @@
           "project": "idiscovery",
           "env": "dev",
           "region": "eastus",
-<<<<<<< HEAD
+
           "instance": "03",
-=======
-          "instance": "01",
->>>>>>> 98a27ac38bec5fde0bb797f7aebf6293bc32e1aa
+
           "resourceType": "storage",
           "resourceGroupIndex": 0
         }
