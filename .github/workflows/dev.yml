@@ -3,7 +3,7 @@ name: CCF-DEV-Deployment
 on:
   push:
     branches:
-      - dev
+      - dev/*
   pull_request:
     branches:
       - dev    
