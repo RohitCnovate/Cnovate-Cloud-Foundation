@@ -107,7 +107,7 @@ jobs:
 
       - name: Deploy Infrastructure
         run: |
-             az deployment sub create \
+             az stack sub create \
              --name mystack-${{ github.ref_name }} \
              --location eastus \
              --template-file ./main.bicep \
