@@ -41,7 +41,7 @@ jobs:
         run: |
           az deployment sub what-if \
             --location eastus \
-            --template-file Cnovate-Cloud-Foundation/main.bicep \
+            --template-file ./main.bicep \
             --parameters @$PARAM_FILE
   securityScan:
     name: Security Scan (Checkov)
@@ -59,7 +59,7 @@ jobs:
       - name: Run Checkov Scan
         uses: bridgecrewio/checkov-action@v12.1347.0
         with:
-          directory: Cnovate-Cloud-Foundation/main.bicep
+          directory: ./main.bicep
           framework: bicep
           soft_fail: false
           output_format: sarif
