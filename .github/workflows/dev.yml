@@ -5,10 +5,9 @@ on:
     branches:
       - dev
       - main
-
   pull_request:
     branches:
-      - dev
+      - dev  
       
 
 env:
@@ -108,13 +107,13 @@ jobs:
 
       - name: Deploy Infrastructure
         run: |
-          az stack sub create \
-            --name mystack-${{ github.ref_name }} \
-            --location eastus \
-            --template-file build/main.json \
-            --parameters @parameters/${{ github.ref_name }}.json \
-            --deny-settings-mode None \
-            --action-on-unmanage detachAll
+             az stack sub create \
+             --name mystack-${{ github.ref_name }} \
+             --location eastus \
+             --template-file ./main.bicep \
+             --parameters @parameters/${{ github.ref_name }}.json \
+             --deny-settings-mode None \
+             --action-on-unmanage detachAll
   # rollback:
   #   name: Rollback Deployment
   #   needs: [ deploy ]
