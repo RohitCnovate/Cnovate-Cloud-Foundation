@@ -53,6 +53,9 @@
     "keyVaultName": { "value": "kvidiscoverydeveastus05" },
     "cmkKeyName": { "value": "cmk-data-key" },
     "keyVaultSku": { "value": "standard" },
+    "keyVaultObjectId": {
+  "value": "77f73706-d594-4cc2-a119-3af7d53702d0"
+},
  
 
     "uamiConfigs": {
