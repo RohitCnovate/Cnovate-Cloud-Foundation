@@ -19,7 +19,7 @@ param tags object = {}
 // ------------------------
 // Generate storage account name using convention
 
-var storageName = toLower('stg${project}${env}${region}${instance}')
+var storageName = ('stg${project}${env}${region}${instance}')
 var storageNameTrimmed = substring(storageName, 0, 24)
 
 resource stg 'Microsoft.Storage/storageAccounts@2025-06-01' = {

@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.39.26.7824",
-      "templateHash": "11242649294455267814"
+      "templateHash": "14221233077269625073"
     }
   },
   "parameters": {
@@ -33,6 +33,22 @@
     }
   },
   "resources": [
+    {
+      "type": "Microsoft.Authorization/roleAssignments",
+      "apiVersion": "2022-04-01",
+      "name": "[guid(parameters('keyVaultName'), format('uami-{0}{1}{2}{3}{4}', parameters('uamiConfigs')[0].resourceType, parameters('uamiConfigs')[0].project, parameters('uamiConfigs')[0].env, parameters('uamiConfigs')[0].region, parameters('uamiConfigs')[0].instance), 'KeyVaultCryptoUser')]",
+      "properties": {
+        "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '00482a5a-887f-4fb3-b363-3b7fe8e74483')]",
+        "principalId": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('rg-{0}{1}{2}{3}', parameters('resourceGroups')[parameters('uamiConfigs')[0].resourceGroupIndex].app, parameters('resourceGroups')[parameters('uamiConfigs')[0].resourceGroupIndex].env, parameters('resourceGroups')[parameters('uamiConfigs')[0].resourceGroupIndex].region, parameters('resourceGroups')[parameters('uamiConfigs')[0].resourceGroupIndex].instance)), 'Microsoft.Resources/deployments', format('uami-{0}{1}{2}{3}{4}', parameters('uamiConfigs')[0].resourceType, parameters('uamiConfigs')[0].project, parameters('uamiConfigs')[0].env, parameters('uamiConfigs')[0].region, parameters('uamiConfigs')[0].instance)), '2025-04-01').outputs.uamiPrincipalId.value]",
+        "principalType": "UserAssignedManagedIdentity"
+      },
+      "dependsOn": [
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('rg-{0}{1}{2}{3}', parameters('resourceGroups')[0].app, parameters('resourceGroups')[0].env, parameters('resourceGroups')[0].region, parameters('resourceGroups')[0].instance)), 'Microsoft.Resources/deployments', parameters('keyVaultName'))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('rg-{0}{1}{2}{3}', parameters('resourceGroups')[parameters('uamiConfigs')[0].resourceGroupIndex].app, parameters('resourceGroups')[parameters('uamiConfigs')[0].resourceGroupIndex].env, parameters('resourceGroups')[parameters('uamiConfigs')[0].resourceGroupIndex].region, parameters('resourceGroups')[parameters('uamiConfigs')[0].resourceGroupIndex].instance)), 'Microsoft.Resources/deployments', format('uami-{0}{1}{2}{3}{4}', parameters('uamiConfigs')[0].resourceType, parameters('uamiConfigs')[0].project, parameters('uamiConfigs')[0].env, parameters('uamiConfigs')[0].region, parameters('uamiConfigs')[0].instance))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('rg-{0}{1}{2}{3}', parameters('resourceGroups')[parameters('uamiConfigs')[0].resourceGroupIndex].app, parameters('resourceGroups')[parameters('uamiConfigs')[0].resourceGroupIndex].env, parameters('resourceGroups')[parameters('uamiConfigs')[0].resourceGroupIndex].region, parameters('resourceGroups')[parameters('uamiConfigs')[0].resourceGroupIndex].instance)), 'Microsoft.Resources/deployments', format('uami-{0}{1}{2}{3}{4}', parameters('uamiConfigs')[0].resourceType, parameters('uamiConfigs')[0].project, parameters('uamiConfigs')[0].env, parameters('uamiConfigs')[0].region, parameters('uamiConfigs')[0].instance))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('rg-{0}{1}{2}{3}', parameters('resourceGroups')[parameters('uamiConfigs')[0].resourceGroupIndex].app, parameters('resourceGroups')[parameters('uamiConfigs')[0].resourceGroupIndex].env, parameters('resourceGroups')[parameters('uamiConfigs')[0].resourceGroupIndex].region, parameters('resourceGroups')[parameters('uamiConfigs')[0].resourceGroupIndex].instance)), 'Microsoft.Resources/deployments', format('uami-{0}{1}{2}{3}{4}', parameters('uamiConfigs')[0].resourceType, parameters('uamiConfigs')[0].project, parameters('uamiConfigs')[0].env, parameters('uamiConfigs')[0].region, parameters('uamiConfigs')[0].instance))]"
+      ]
+    },
     {
       "copy": {
         "name": "rgDeploy",
@@ -187,6 +203,9 @@
         },
         "mode": "Incremental",
         "parameters": {
+          "name": {
+            "value": "[parameters('keyVaultName')]"
+          },
           "location": {
             "value": "[parameters('resourceGroups')[0].location]"
           },
@@ -195,9 +214,6 @@
           },
           "objectId": {
             "value": "[parameters('keyVaultObjectId')]"
-          },
-          "name": {
-            "value": "[parameters('keyVaultName')]"
           }
         },
         "template": {
@@ -207,7 +223,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.39.26.7824",
-              "templateHash": "9821942047850751311"
+              "templateHash": "13431001646693714921"
             }
           },
           "parameters": {
@@ -298,9 +314,13 @@
               "type": "string",
               "value": "[parameters('name')]"
             },
+            "vaultId": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.KeyVault/vaults', parameters('name'))]"
+            },
             "keyId": {
               "type": "string",
-              "value": "[resourceId('Microsoft.KeyVault/vaults/keys', parameters('name'), parameters('keyName'))]"
+              "value": "[reference(resourceId('Microsoft.KeyVault/vaults/keys', parameters('name'), parameters('keyName')), '2022-07-01').keyUriWithVersion]"
             }
           }
         }
@@ -378,7 +398,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.39.26.7824",
-              "templateHash": "14136751874345143703"
+              "templateHash": "5377806688233195490"
             }
           },
           "parameters": {
@@ -430,7 +450,7 @@
             }
           },
           "variables": {
-            "storageName": "[toLower(format('stg{0}{1}{2}{3}', parameters('project'), parameters('env'), parameters('region'), parameters('instance')))]",
+            "storageName": "[format('stg{0}{1}{2}{3}', parameters('project'), parameters('env'), parameters('region'), parameters('instance'))]",
             "storageNameTrimmed": "[substring(variables('storageName'), 0, 24)]"
           },
           "resources": [
@@ -504,13 +524,25 @@
         }
       }
     },
-    "keyVaultName": {
+    "keyVaultId": {
+      "type": "string",
+      "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('rg-{0}{1}{2}{3}', parameters('resourceGroups')[0].app, parameters('resourceGroups')[0].env, parameters('resourceGroups')[0].region, parameters('resourceGroups')[0].instance)), 'Microsoft.Resources/deployments', parameters('keyVaultName')), '2025-04-01').outputs.vaultId.value]"
+    },
+    "keyVaultName_out": {
       "type": "string",
       "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('rg-{0}{1}{2}{3}', parameters('resourceGroups')[0].app, parameters('resourceGroups')[0].env, parameters('resourceGroups')[0].region, parameters('resourceGroups')[0].instance)), 'Microsoft.Resources/deployments', parameters('keyVaultName')), '2025-04-01').outputs.vaultName.value]"
     },
     "cmkKeyId": {
       "type": "string",
       "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('rg-{0}{1}{2}{3}', parameters('resourceGroups')[0].app, parameters('resourceGroups')[0].env, parameters('resourceGroups')[0].region, parameters('resourceGroups')[0].instance)), 'Microsoft.Resources/deployments', parameters('keyVaultName')), '2025-04-01').outputs.keyId.value]"
+    },
+    "uamiId": {
+      "type": "string",
+      "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('rg-{0}{1}{2}{3}', parameters('resourceGroups')[parameters('uamiConfigs')[0].resourceGroupIndex].app, parameters('resourceGroups')[parameters('uamiConfigs')[0].resourceGroupIndex].env, parameters('resourceGroups')[parameters('uamiConfigs')[0].resourceGroupIndex].region, parameters('resourceGroups')[parameters('uamiConfigs')[0].resourceGroupIndex].instance)), 'Microsoft.Resources/deployments', format('uami-{0}{1}{2}{3}{4}', parameters('uamiConfigs')[0].resourceType, parameters('uamiConfigs')[0].project, parameters('uamiConfigs')[0].env, parameters('uamiConfigs')[0].region, parameters('uamiConfigs')[0].instance)), '2025-04-01').outputs.uamiId.value]"
+    },
+    "uamiPrincipalId": {
+      "type": "string",
+      "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('rg-{0}{1}{2}{3}', parameters('resourceGroups')[parameters('uamiConfigs')[0].resourceGroupIndex].app, parameters('resourceGroups')[parameters('uamiConfigs')[0].resourceGroupIndex].env, parameters('resourceGroups')[parameters('uamiConfigs')[0].resourceGroupIndex].region, parameters('resourceGroups')[parameters('uamiConfigs')[0].resourceGroupIndex].instance)), 'Microsoft.Resources/deployments', format('uami-{0}{1}{2}{3}{4}', parameters('uamiConfigs')[0].resourceType, parameters('uamiConfigs')[0].project, parameters('uamiConfigs')[0].env, parameters('uamiConfigs')[0].region, parameters('uamiConfigs')[0].instance)), '2025-04-01').outputs.uamiPrincipalId.value]"
     }
   }
 }
