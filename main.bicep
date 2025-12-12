@@ -5,7 +5,7 @@ param stgConfigs array
 param keyVaultName string
 param cmkKeyName string
 param keyVaultSku string = 'standard'
-// param keyVaultObjectId string
+param keyVaultObjectId string
 param uamiConfigs array
 
 
@@ -69,7 +69,7 @@ module keyVaultModule './modules/keyvault/keyvault.bicep' = {
     // keyVaultName: keyVaultName
     // cmkKeyName: cmkKeyName
     skuName: keyVaultSku
-    // objectId: keyVaultObjectId
+    objectId: keyVaultObjectId
     name: keyVaultName  
   }
 }

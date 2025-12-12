@@ -1,0 +1,516 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.39.26.7824",
+      "templateHash": "11242649294455267814"
+    }
+  },
+  "parameters": {
+    "resourceGroups": {
+      "type": "array"
+    },
+    "stgConfigs": {
+      "type": "array"
+    },
+    "keyVaultName": {
+      "type": "string"
+    },
+    "cmkKeyName": {
+      "type": "string"
+    },
+    "keyVaultSku": {
+      "type": "string",
+      "defaultValue": "standard"
+    },
+    "keyVaultObjectId": {
+      "type": "string"
+    },
+    "uamiConfigs": {
+      "type": "array"
+    }
+  },
+  "resources": [
+    {
+      "copy": {
+        "name": "rgDeploy",
+        "count": "[length(parameters('resourceGroups'))]"
+      },
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-04-01",
+      "name": "[format('rg-{0}{1}{2}{3}', parameters('resourceGroups')[copyIndex()].app, parameters('resourceGroups')[copyIndex()].env, parameters('resourceGroups')[copyIndex()].region, parameters('resourceGroups')[copyIndex()].instance)]",
+      "location": "[deployment().location]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "name": {
+            "value": "[format('rg-{0}{1}{2}{3}', parameters('resourceGroups')[copyIndex()].app, parameters('resourceGroups')[copyIndex()].env, parameters('resourceGroups')[copyIndex()].region, parameters('resourceGroups')[copyIndex()].instance)]"
+          },
+          "location": {
+            "value": "[parameters('resourceGroups')[copyIndex()].location]"
+          },
+          "tags": {
+            "value": "[parameters('resourceGroups')[copyIndex()].tags]"
+          },
+          "managedBy": "[if(empty(parameters('resourceGroups')[copyIndex()].managedBy), createObject('value', null()), createObject('value', parameters('resourceGroups')[copyIndex()].managedBy))]"
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.39.26.7824",
+              "templateHash": "11887868934809574530"
+            }
+          },
+          "parameters": {
+            "name": {
+              "type": "string"
+            },
+            "location": {
+              "type": "string"
+            },
+            "tags": {
+              "type": "object",
+              "defaultValue": {}
+            },
+            "managedBy": {
+              "type": "string",
+              "defaultValue": ""
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Resources/resourceGroups",
+              "apiVersion": "2021-04-01",
+              "name": "[parameters('name')]",
+              "location": "[parameters('location')]",
+              "tags": "[parameters('tags')]",
+              "managedBy": "[if(empty(parameters('managedBy')), null(), parameters('managedBy'))]"
+            }
+          ],
+          "outputs": {
+            "name": {
+              "type": "string",
+              "value": "[parameters('name')]"
+            },
+            "location": {
+              "type": "string",
+              "value": "[reference(subscriptionResourceId('Microsoft.Resources/resourceGroups', parameters('name')), '2021-04-01', 'full').location]"
+            }
+          }
+        }
+      }
+    },
+    {
+      "copy": {
+        "name": "uamiModule",
+        "count": "[length(parameters('uamiConfigs'))]"
+      },
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-04-01",
+      "name": "[format('uami-{0}{1}{2}{3}{4}', parameters('uamiConfigs')[copyIndex()].resourceType, parameters('uamiConfigs')[copyIndex()].project, parameters('uamiConfigs')[copyIndex()].env, parameters('uamiConfigs')[copyIndex()].region, parameters('uamiConfigs')[copyIndex()].instance)]",
+      "resourceGroup": "[format('rg-{0}{1}{2}{3}', parameters('resourceGroups')[parameters('uamiConfigs')[copyIndex()].resourceGroupIndex].app, parameters('resourceGroups')[parameters('uamiConfigs')[copyIndex()].resourceGroupIndex].env, parameters('resourceGroups')[parameters('uamiConfigs')[copyIndex()].resourceGroupIndex].region, parameters('resourceGroups')[parameters('uamiConfigs')[copyIndex()].resourceGroupIndex].instance)]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "name": {
+            "value": "[format('uami-{0}{1}{2}{3}{4}', parameters('uamiConfigs')[copyIndex()].resourceType, parameters('uamiConfigs')[copyIndex()].project, parameters('uamiConfigs')[copyIndex()].env, parameters('uamiConfigs')[copyIndex()].region, parameters('uamiConfigs')[copyIndex()].instance)]"
+          },
+          "location": {
+            "value": "[parameters('resourceGroups')[parameters('uamiConfigs')[copyIndex()].resourceGroupIndex].location]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.39.26.7824",
+              "templateHash": "9983959508839995683"
+            }
+          },
+          "parameters": {
+            "name": {
+              "type": "string"
+            },
+            "location": {
+              "type": "string"
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
+              "apiVersion": "2023-01-31",
+              "name": "[parameters('name')]",
+              "location": "[parameters('location')]"
+            }
+          ],
+          "outputs": {
+            "uamiId": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('name'))]"
+            },
+            "uamiName": {
+              "type": "string",
+              "value": "[parameters('name')]"
+            },
+            "uamiPrincipalId": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('name')), '2023-01-31').principalId]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "rgDeploy"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-04-01",
+      "name": "[parameters('keyVaultName')]",
+      "resourceGroup": "[format('rg-{0}{1}{2}{3}', parameters('resourceGroups')[0].app, parameters('resourceGroups')[0].env, parameters('resourceGroups')[0].region, parameters('resourceGroups')[0].instance)]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "location": {
+            "value": "[parameters('resourceGroups')[0].location]"
+          },
+          "skuName": {
+            "value": "[parameters('keyVaultSku')]"
+          },
+          "objectId": {
+            "value": "[parameters('keyVaultObjectId')]"
+          },
+          "name": {
+            "value": "[parameters('keyVaultName')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.39.26.7824",
+              "templateHash": "9821942047850751311"
+            }
+          },
+          "parameters": {
+            "name": {
+              "type": "string"
+            },
+            "location": {
+              "type": "string"
+            },
+            "skuName": {
+              "type": "string",
+              "defaultValue": "standard"
+            },
+            "keyName": {
+              "type": "string",
+              "defaultValue": "cmk-key"
+            },
+            "tags": {
+              "type": "object",
+              "defaultValue": {}
+            },
+            "objectId": {
+              "type": "string"
+            }
+          },
+          "variables": {
+            "tenantId": "[subscription().tenantId]"
+          },
+          "resources": [
+            {
+              "type": "Microsoft.KeyVault/vaults",
+              "apiVersion": "2023-02-01",
+              "name": "[parameters('name')]",
+              "location": "[parameters('location')]",
+              "tags": "[parameters('tags')]",
+              "properties": {
+                "enabledForDeployment": true,
+                "enabledForDiskEncryption": true,
+                "enableRbacAuthorization": true,
+                "enableSoftDelete": true,
+                "enablePurgeProtection": true,
+                "softDeleteRetentionInDays": 90,
+                "tenantId": "[variables('tenantId')]",
+                "accessPolicies": [
+                  {
+                    "tenantId": "[variables('tenantId')]",
+                    "objectId": "[parameters('objectId')]",
+                    "permissions": {
+                      "keys": [
+                        "get",
+                        "list",
+                        "create",
+                        "delete",
+                        "update",
+                        "sign",
+                        "verify",
+                        "wrapKey",
+                        "unwrapKey"
+                      ]
+                    }
+                  }
+                ],
+                "sku": {
+                  "family": "A",
+                  "name": "[parameters('skuName')]"
+                }
+              }
+            },
+            {
+              "type": "Microsoft.KeyVault/vaults/keys",
+              "apiVersion": "2022-07-01",
+              "name": "[format('{0}/{1}', parameters('name'), parameters('keyName'))]",
+              "properties": {
+                "kty": "RSA",
+                "keySize": 2048,
+                "attributes": {
+                  "enabled": true,
+                  "exp": 1767225599
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.KeyVault/vaults', parameters('name'))]"
+              ]
+            }
+          ],
+          "outputs": {
+            "vaultName": {
+              "type": "string",
+              "value": "[parameters('name')]"
+            },
+            "keyId": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.KeyVault/vaults/keys', parameters('name'), parameters('keyName'))]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "rgDeploy",
+        "uamiModule"
+      ]
+    },
+    {
+      "copy": {
+        "name": "storageAccounts",
+        "count": "[length(parameters('stgConfigs'))]"
+      },
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-04-01",
+      "name": "[format('stg{0}{1}{2}{3}', parameters('stgConfigs')[copyIndex()].project, parameters('stgConfigs')[copyIndex()].env, parameters('stgConfigs')[copyIndex()].region, parameters('stgConfigs')[copyIndex()].instance)]",
+      "resourceGroup": "[format('rg-{0}{1}{2}{3}', parameters('resourceGroups')[parameters('stgConfigs')[copyIndex()].resourceGroupIndex].app, parameters('resourceGroups')[parameters('stgConfigs')[copyIndex()].resourceGroupIndex].env, parameters('resourceGroups')[parameters('stgConfigs')[copyIndex()].resourceGroupIndex].region, parameters('resourceGroups')[parameters('stgConfigs')[copyIndex()].resourceGroupIndex].instance)]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "project": {
+            "value": "[parameters('stgConfigs')[copyIndex()].project]"
+          },
+          "env": {
+            "value": "[parameters('stgConfigs')[copyIndex()].env]"
+          },
+          "region": {
+            "value": "[parameters('stgConfigs')[copyIndex()].region]"
+          },
+          "instance": {
+            "value": "[parameters('stgConfigs')[copyIndex()].instance]"
+          },
+          "location": {
+            "value": "[parameters('stgConfigs')[copyIndex()].location]"
+          },
+          "skuName": {
+            "value": "[parameters('stgConfigs')[copyIndex()].skuName]"
+          },
+          "kind": {
+            "value": "[parameters('stgConfigs')[copyIndex()].kind]"
+          },
+          "accessTier": {
+            "value": "[parameters('stgConfigs')[copyIndex()].accessTier]"
+          },
+          "minimumTlsVersion": {
+            "value": "[parameters('stgConfigs')[copyIndex()].minimumTlsVersion]"
+          },
+          "enableCMK": {
+            "value": "[parameters('stgConfigs')[copyIndex()].enableCMK]"
+          },
+          "keyVaultUri": {
+            "value": "[parameters('stgConfigs')[copyIndex()].keyVaultUri]"
+          },
+          "keyName": {
+            "value": "[parameters('cmkKeyName')]"
+          },
+          "keyVersion": {
+            "value": "[parameters('stgConfigs')[copyIndex()].keyVersion]"
+          },
+          "userAssignedIdentityId": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('rg-{0}{1}{2}{3}', parameters('resourceGroups')[parameters('uamiConfigs')[parameters('stgConfigs')[copyIndex()].uamiIndex].resourceGroupIndex].app, parameters('resourceGroups')[parameters('uamiConfigs')[parameters('stgConfigs')[copyIndex()].uamiIndex].resourceGroupIndex].env, parameters('resourceGroups')[parameters('uamiConfigs')[parameters('stgConfigs')[copyIndex()].uamiIndex].resourceGroupIndex].region, parameters('resourceGroups')[parameters('uamiConfigs')[parameters('stgConfigs')[copyIndex()].uamiIndex].resourceGroupIndex].instance)), 'Microsoft.Resources/deployments', format('uami-{0}{1}{2}{3}{4}', parameters('uamiConfigs')[parameters('stgConfigs')[copyIndex()].uamiIndex].resourceType, parameters('uamiConfigs')[parameters('stgConfigs')[copyIndex()].uamiIndex].project, parameters('uamiConfigs')[parameters('stgConfigs')[copyIndex()].uamiIndex].env, parameters('uamiConfigs')[parameters('stgConfigs')[copyIndex()].uamiIndex].region, parameters('uamiConfigs')[parameters('stgConfigs')[copyIndex()].uamiIndex].instance)), '2025-04-01').outputs.uamiId.value]"
+          },
+          "tags": {
+            "value": "[parameters('stgConfigs')[copyIndex()].tags]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.39.26.7824",
+              "templateHash": "14136751874345143703"
+            }
+          },
+          "parameters": {
+            "project": {
+              "type": "string"
+            },
+            "env": {
+              "type": "string"
+            },
+            "region": {
+              "type": "string"
+            },
+            "instance": {
+              "type": "string"
+            },
+            "location": {
+              "type": "string"
+            },
+            "skuName": {
+              "type": "string"
+            },
+            "kind": {
+              "type": "string"
+            },
+            "accessTier": {
+              "type": "string"
+            },
+            "minimumTlsVersion": {
+              "type": "string"
+            },
+            "enableCMK": {
+              "type": "bool"
+            },
+            "keyVaultUri": {
+              "type": "string"
+            },
+            "keyName": {
+              "type": "string"
+            },
+            "keyVersion": {
+              "type": "string"
+            },
+            "userAssignedIdentityId": {
+              "type": "string"
+            },
+            "tags": {
+              "type": "object",
+              "defaultValue": {}
+            }
+          },
+          "variables": {
+            "storageName": "[toLower(format('stg{0}{1}{2}{3}', parameters('project'), parameters('env'), parameters('region'), parameters('instance')))]",
+            "storageNameTrimmed": "[substring(variables('storageName'), 0, 24)]"
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Storage/storageAccounts",
+              "apiVersion": "2025-06-01",
+              "name": "[variables('storageNameTrimmed')]",
+              "location": "[parameters('location')]",
+              "kind": "[parameters('kind')]",
+              "tags": "[parameters('tags')]",
+              "sku": {
+                "name": "[parameters('skuName')]"
+              },
+              "identity": "[if(parameters('enableCMK'), createObject('type', 'UserAssigned', 'userAssignedIdentities', createObject(format('{0}', parameters('userAssignedIdentityId')), createObject())), createObject('type', 'None'))]",
+              "properties": {
+                "accessTier": "[parameters('accessTier')]",
+                "minimumTlsVersion": "[parameters('minimumTlsVersion')]",
+                "supportsHttpsTrafficOnly": true,
+                "allowBlobPublicAccess": false,
+                "publicNetworkAccess": "Enabled",
+                "encryption": {
+                  "keySource": "[if(parameters('enableCMK'), 'Microsoft.Keyvault', 'Microsoft.Storage')]",
+                  "requireInfrastructureEncryption": true,
+                  "identity": "[if(parameters('enableCMK'), createObject('userAssignedIdentity', parameters('userAssignedIdentityId')), null())]",
+                  "keyvaultproperties": "[if(parameters('enableCMK'), createObject('keyname', parameters('keyName'), 'keyversion', parameters('keyVersion'), 'keyvaulturi', parameters('keyVaultUri')), null())]",
+                  "services": {
+                    "blob": {
+                      "enabled": true,
+                      "keyType": "Account"
+                    },
+                    "file": {
+                      "enabled": true,
+                      "keyType": "Account"
+                    }
+                  }
+                }
+              }
+            }
+          ],
+          "outputs": {
+            "id": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.Storage/storageAccounts', variables('storageNameTrimmed'))]"
+            },
+            "storageName": {
+              "type": "string",
+              "value": "[variables('storageNameTrimmed')]"
+            },
+            "storageLocation": {
+              "type": "string",
+              "value": "[parameters('location')]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('rg-{0}{1}{2}{3}', parameters('resourceGroups')[0].app, parameters('resourceGroups')[0].env, parameters('resourceGroups')[0].region, parameters('resourceGroups')[0].instance)), 'Microsoft.Resources/deployments', parameters('keyVaultName'))]",
+        "rgDeploy",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('rg-{0}{1}{2}{3}', parameters('resourceGroups')[parameters('uamiConfigs')[parameters('stgConfigs')[copyIndex()].uamiIndex].resourceGroupIndex].app, parameters('resourceGroups')[parameters('uamiConfigs')[parameters('stgConfigs')[copyIndex()].uamiIndex].resourceGroupIndex].env, parameters('resourceGroups')[parameters('uamiConfigs')[parameters('stgConfigs')[copyIndex()].uamiIndex].resourceGroupIndex].region, parameters('resourceGroups')[parameters('uamiConfigs')[parameters('stgConfigs')[copyIndex()].uamiIndex].resourceGroupIndex].instance)), 'Microsoft.Resources/deployments', format('uami-{0}{1}{2}{3}{4}', parameters('uamiConfigs')[parameters('stgConfigs')[copyIndex()].uamiIndex].resourceType, parameters('uamiConfigs')[parameters('stgConfigs')[copyIndex()].uamiIndex].project, parameters('uamiConfigs')[parameters('stgConfigs')[copyIndex()].uamiIndex].env, parameters('uamiConfigs')[parameters('stgConfigs')[copyIndex()].uamiIndex].region, parameters('uamiConfigs')[parameters('stgConfigs')[copyIndex()].uamiIndex].instance))]"
+      ]
+    }
+  ],
+  "outputs": {
+    "createdResourceGroups": {
+      "type": "array",
+      "copy": {
+        "count": "[length(parameters('resourceGroups'))]",
+        "input": {
+          "name": "[format('rg-{0}{1}{2}{3}', parameters('resourceGroups')[copyIndex()].app, parameters('resourceGroups')[copyIndex()].env, parameters('resourceGroups')[copyIndex()].region, parameters('resourceGroups')[copyIndex()].instance)]",
+          "location": "[parameters('resourceGroups')[copyIndex()].location]"
+        }
+      }
+    },
+    "keyVaultName": {
+      "type": "string",
+      "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('rg-{0}{1}{2}{3}', parameters('resourceGroups')[0].app, parameters('resourceGroups')[0].env, parameters('resourceGroups')[0].region, parameters('resourceGroups')[0].instance)), 'Microsoft.Resources/deployments', parameters('keyVaultName')), '2025-04-01').outputs.vaultName.value]"
+    },
+    "cmkKeyId": {
+      "type": "string",
+      "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('rg-{0}{1}{2}{3}', parameters('resourceGroups')[0].app, parameters('resourceGroups')[0].env, parameters('resourceGroups')[0].region, parameters('resourceGroups')[0].instance)), 'Microsoft.Resources/deployments', parameters('keyVaultName')), '2025-04-01').outputs.keyId.value]"
+    }
+  }
+}
