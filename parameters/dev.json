@@ -35,7 +35,7 @@
           "minimumTlsVersion": "TLS1_2",
           "enableCMK": true,
 
-          "keyVaultUri": "https://kvidiscoverydeveastus01.vault.azure.net/",
+          "keyVaultUri": "https://kvidiscoverydeveastus05.vault.azure.net/",
           "keyName": "cmk-data-key",
           "keyVersion": "",
 
@@ -50,7 +50,7 @@
       ]
     },
 
-    "keyVaultName": { "value": "kvidiscoverydeveastus01" },
+    "keyVaultName": { "value": "kvidiscoverydeveastus05" },
     "cmkKeyName": { "value": "cmk-data-key" },
     "keyVaultSku": { "value": "standard" },
  
