@@ -4,24 +4,19 @@
   "parameters": {
     "location": { "value": "eastus" },
     "openAiName": { "value": "openai-prod-05" },
-    "enablePrivateEndpoint": { "value": true },
-    "subnetId": { "value": "/subscriptions/<subId>/resourceGroups/<rg>/providers/Microsoft.Network/virtualNetworks/<vnet>/subnets/<subnet>" },
+    "enablePrivateEndpoint": { "value": false }, 
+    "subnetId": { "value": "" },
     "deployments": {
       "value": [
         {
           "deploymentName": "gpt4o",
           "modelName": "gpt-4o",
-          "modelVersion": "2024-05-13",
-          "capacity": 10
+          "modelVersion": "2024-05-13"
         }
       ]
     }
   }
 }
-
-
-
-
 
 
 

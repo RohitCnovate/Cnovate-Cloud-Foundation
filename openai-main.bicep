@@ -7,13 +7,7 @@ param enablePrivateEndpoint bool = false
 param subnetId string = ''
 param deployments array
 
-// Optional: Log Analytics (existing workspace)
-param logAnalyticsResourceGroup string = ''
-param logAnalyticsName string = ''
-
-// ------------------------
 // Deploy OpenAI Account
-// ------------------------
 module openaiAccount './modules/ai-services/openai-account.bicep' = {
   name: 'openai-account'
   params: {
@@ -21,14 +15,10 @@ module openaiAccount './modules/ai-services/openai-account.bicep' = {
     location: location
     enablePrivateEndpoint: enablePrivateEndpoint
     subnetId: subnetId
-    logAnalyticsResourceGroup: logAnalyticsResourceGroup
-    logAnalyticsName: logAnalyticsName
   }
 }
 
-// ------------------------
 // Deploy OpenAI Deployments
-// ------------------------
 module openaiDeployments './modules/ai-services/openai-deployment.bicep' = [
   for d in deployments: {
     name: 'deploy-${d.deploymentName}'
@@ -37,7 +27,6 @@ module openaiDeployments './modules/ai-services/openai-deployment.bicep' = [
       deploymentName: d.deploymentName
       modelName: d.modelName
       modelVersion: d.modelVersion
-      capacity: d.capacity
     }
     dependsOn: [
       openaiAccount
