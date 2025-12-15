@@ -5,11 +5,9 @@ on:
     branches:
       - dev
       - main
-      - prod
   pull_request:
     branches:
-      - dev
-      - prod
+      - dev  
 
 env:
   ENV_NAME: ${{ github.ref_name }}
@@ -37,8 +35,11 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
+  
       - name: Lint Bicep Templates
-        run: az bicep lint --file ./main.bicep
+        run: |
+          az bicep lint --file ./main.bicep
+
 
       - name: Build Bicep File
         run: az bicep build --file ./main.bicep
@@ -78,9 +79,9 @@ jobs:
 
   manualApproval:
     name: Manual Approval (Only for PROD)
+    needs: [ securityScan ]
     runs-on: ubuntu-latest
     if: ${{ github.ref_name == 'prod' }}
-    needs: [securityScan]
 
     environment:
       name: approval-prod
@@ -89,14 +90,9 @@ jobs:
       - name: Waiting for Approval
         run: "true"
 
-
-
-
   deploy:
     name: Deploy Infrastructure
-    needs:
-      - securityScan
-      - manualApproval
+    needs: [ securityScan ]
     runs-on: ubuntu-latest
     environment: ${{ github.ref_name }}
 
@@ -125,58 +121,55 @@ jobs:
             --deny-settings-mode None \
             --action-on-unmanage detachAll
 
-  rollback:
-    name: Rollback PROD Deployment
-    needs: deploy
-    runs-on: ubuntu-latest
-    if: always() && needs.deploy.result == 'failure' && github.ref_name == 'prod'
+  # rollback:
+  #   name: Rollback Deployment
+  #   needs: [ deploy ]
+  #   runs-on: ubuntu-latest
+  #   if: failure() && github.ref_name == 'main'
 
-    permissions:
-      id-token: write
-      contents: read
+  #   permissions:
+  #     id-token: write
+  #     contents: read
 
-    steps:
-      - name: Get Last Successful PROD Commit
-        id: last_success
-        uses: actions/github-script@v6
-        with:
-          script: |
-            const runs = await github.rest.actions.listWorkflowRuns({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              workflow_id: "CCF-DEV-Deployment",
-              status: "success",
-              branch: "prod"
-            });
+  #   steps:
+  #     - name: Get Last Successful Commit
+  #       id: last_success
+  #       uses: actions/github-script@v6
+  #       with:
+  #         script: |
+  #           const runs = await github.rest.actions.listWorkflowRuns({
+  #             owner: context.repo.owner,
+  #             repo: context.repo.repo,
+  #             workflow_id: "blank.yaml",  
+  #             status: "success",
+  #             branch: "main"
+  #           });
+  #           if (!runs.data.workflow_runs.length) {
+  #             core.setFailed("No successful workflow run found for main branch!");
+  #           } else {
+  #             core.setOutput("sha", runs.data.workflow_runs[0].head_sha);
+  #           }
+  #     - name: Checkout Last Successful Commit
+  #       uses: actions/checkout@v4
+  #       with:
+  #         ref: ${{ steps.last_success.outputs.sha }}
 
-            if (!runs.data.workflow_runs.length) {
-              core.setFailed("No successful PROD deployment found");
-            } else {
-              core.setOutput("sha", runs.data.workflow_runs[0].head_sha);
-            }
+  #     - name: Azure Login (OIDC)
+  #       uses: azure/login@v2
+  #       with:
+  #         client-id: ${{ secrets.AZURE_CLIENT_ID }}
+  #         tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+  #         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Checkout Last Known Good State
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ steps.last_success.outputs.sha }}
-
-      - name: Azure Login (OIDC)
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-
-      - name: Rollback to Last Known Good State
-        run: |
-          az stack sub create \
-            --name mystack-prod \
-            --location eastus \
-            --template-file ./main.bicep \
-            --parameters @parameters/prod.json \
-            --deny-settings-mode None \
-            --action-on-unmanage detachAll
-
-      - name: Rollback Completed
-        run: echo "Rollback completed successfully"
-
+  #     - name: Run Rollback Deployment
+  #       run: |
+  #        az stack sub create \
+  #           --name rollbackstack-${{ github.run_id }} \
+  #           --location eastus \
+  #           --template-file main.bicep \
+  #           --parameters @parameters/prod.json \
+  #           --deny-settings-mode None \
+  #           --action-on-unmanage detachAll 
+  #           --parameters @parameters/prod.json
+  #     - name: Rollback Completed
+  #       run: "true"
