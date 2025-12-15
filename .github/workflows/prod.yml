@@ -37,11 +37,8 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-  
       - name: Lint Bicep Templates
-        run: |
-          az bicep lint --file ./main.bicep
-
+        run: az bicep lint --file ./main.bicep
 
       - name: Build Bicep File
         run: az bicep build --file ./main.bicep
@@ -80,21 +77,23 @@ jobs:
           sarif_file: results.sarif
 
   manualApproval:
-    name: Manual Approval (Only for PROD)
-    needs: [ securityScan ]
+    name: Manual Approval (PROD Only)
+    needs: securityScan
     runs-on: ubuntu-latest
-    if: ${{ github.ref_name == 'prod' }}
+    if: github.ref_name == 'prod'
 
     environment:
       name: approval-prod
 
     steps:
-      - name: Waiting for Approval
-        run: "true"
+      - name: Waiting for Manual Approval
+        run: echo "Awaiting approval for PROD deployment"
 
   deploy:
     name: Deploy Infrastructure
-    needs: [ securityScan ]
+    needs:
+      - securityScan
+      - manualApproval
     runs-on: ubuntu-latest
     environment: ${{ github.ref_name }}
 
@@ -124,17 +123,17 @@ jobs:
             --action-on-unmanage detachAll
 
   rollback:
-    name: Rollback Deployment
-    needs: [ deploy ]
+    name: Rollback PROD Deployment
+    needs: deploy
     runs-on: ubuntu-latest
-    if: failure() && github.ref_name == 'main'
+    if: always() && needs.deploy.result == 'failure' && github.ref_name == 'prod'
 
     permissions:
       id-token: write
       contents: read
 
     steps:
-      - name: Get Last Successful Commit
+      - name: Get Last Successful PROD Commit
         id: last_success
         uses: actions/github-script@v6
         with:
@@ -142,16 +141,18 @@ jobs:
             const runs = await github.rest.actions.listWorkflowRuns({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              workflow_id: "blank.yaml",  
+              workflow_id: "CCF-DEV-Deployment",
               status: "success",
-              branch: "main"
+              branch: "prod"
             });
+
             if (!runs.data.workflow_runs.length) {
-              core.setFailed("No successful workflow run found for main branch!");
+              core.setFailed("No successful PROD deployment found");
             } else {
               core.setOutput("sha", runs.data.workflow_runs[0].head_sha);
             }
-      - name: Checkout Last Successful Commit
+
+      - name: Checkout Last Known Good State
         uses: actions/checkout@v4
         with:
           ref: ${{ steps.last_success.outputs.sha }}
@@ -163,15 +164,16 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Run Rollback Deployment
+      - name: Rollback to Last Known Good State
         run: |
-         az stack sub create \
-            --name rollbackstack-${{ github.run_id }} \
+          az stack sub create \
+            --name mystack-prod \
             --location eastus \
-            --template-file main.bicep \
+            --template-file ./main.bicep \
             --parameters @parameters/prod.json \
             --deny-settings-mode None \
-            --action-on-unmanage detachAll 
-            --parameters @parameters/prod.json
+            --action-on-unmanage detachAll
+
       - name: Rollback Completed
-        run: "true"
+        run: echo "Rollback completed successfully"
+
