@@ -77,10 +77,17 @@ jobs:
           sarif_file: results.sarif
 
   manualApproval:
-    name: Manual Approval (PROD Only)
-    needs: securityScan
+    name: Manual Approval (Only for PROD)
     runs-on: ubuntu-latest
-    if: github.ref_name == 'prod'
+    if: ${{ github.ref_name == 'prod' }}
+    needs: [securityScan]
+
+    environment:
+      name: approval-prod
+
+    steps:
+      - name: Waiting for Approval
+        run: "true"
 
     environment:
       name: approval-prod
