@@ -57,7 +57,7 @@
     "cmkKeyName": { "value": "cmk-data-key" },
     "keyVaultSku": { "value": "standard" },
     "keyVaultObjectId": {
-  "value": "77f73706-d594-4cc2-a119-3af7d53702d0"
+  "value": "e851ac43-fc4c-46ce-beea-eeb7c4460273"
 },
  
 
@@ -69,7 +69,7 @@
           "region": "eastus",
 
           "instance": "03",
- "uamiObjectId": "c8e7786f-8f35-4a64-aafe-051a9b8001c0",
+ "uamiObjectId": "e851ac43-fc4c-46ce-beea-eeb7c4460273",
           "resourceType": "storage",
           "resourceGroupIndex": 0
         }
