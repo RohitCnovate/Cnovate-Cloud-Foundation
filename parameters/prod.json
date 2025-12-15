@@ -1,7 +1,79 @@
 {
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
   "contentVersion": "1.0.0.0",
-    "location": { "value": "eastus" },
-    "aiAccountName": { "value": "my-openai-account" },
-    "modelName": { "value": "gpt-4o" },
-    "deploymentName": { "value": "gpt4o-deployment" }}
+  "parameters": {
+
+    "resourceGroups": {
+      "value": [
+        {
+          "app": "idiscovery",
+          "env": "prod",
+          "region": "eastus",
+          "instance": "02",
+          "location": "eastus",
+          "managedBy": "PlatformTeam",
+          "tags": {
+            "app": "idiscovery",
+            "tier": "web",
+            "env": "prod"
+          }
+        }
+      ]
+    },
+
+    "stgConfigs": {
+      "value": [
+        {
+          "project": "idiscovery",
+          "env": "prod",
+          "region": "eastus",
+          "instance": "02",
+          "location": "eastus",
+          "skuName": "Standard_LRS",
+          "kind": "StorageV2",
+          "accessTier": "Hot",
+          "minimumTlsVersion": "TLS1_2",
+          "enableCMK": true,
+
+
+          "keyVaultUri": "https://kvidiscoverydeveastus09.vault.azure.net/",
+          "keyName": "keyVaultModule.outputs.keyName",
+          
+          "keyVersion": "keyVaultModule.outputs.keyVersion",
+      "userAssignedIdentityId": "uamiModule[stg.uamiIndex].outputs.uamiId",
+
+          "resourceGroupIndex": 0,
+          "uamiIndex": 0,
+
+          "tags": {
+            "env": "prod",
+            "owner": "teamB"
+          }
+        }
+      ]
+    },
+
+    "keyVaultName": { "value": "kvidiscoveryprodeastus09" },
+    "cmkKeyName": { "value": "cmk-data-key" },
+    "keyVaultSku": { "value": "standard" },
+    "keyVaultObjectId": {
+  "value": "e851ac43-fc4c-46ce-beea-eeb7c4460273"
+},
+ 
+
+    "uamiConfigs": {
+      "value": [
+        {
+          "project": "idiscovery",
+          "env": "dev",
+          "region": "eastus",
+
+          "instance": "03",
+ "uamiObjectId": "e851ac43-fc4c-46ce-beea-eeb7c4460273",
+          "resourceType": "storage",
+          "resourceGroupIndex": 0
+        }
+      ]
+    }
+  }
+}
