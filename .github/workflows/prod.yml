@@ -89,12 +89,8 @@ jobs:
       - name: Waiting for Approval
         run: "true"
 
-    environment:
-      name: approval-prod
 
-    steps:
-      - name: Waiting for Manual Approval
-        run: echo "Awaiting approval for PROD deployment"
+
 
   deploy:
     name: Deploy Infrastructure
