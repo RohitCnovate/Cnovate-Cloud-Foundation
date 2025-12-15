@@ -14,3 +14,26 @@
     "storageAccountName": { "value": "st873" },
     "userAssignedIdentityName": { "value": "storage-uami-dev" },
     "applicationInsightsName": { "value": "app catalogsearch1-ai-prod-01" } }}
+
+
+    {
+"$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+"contentVersion": "1.0.0.0",
+"parameters": {
+"location": { "value": "eastus" },
+"openAiName": { "value": "openai-dev-01" },
+"enablePrivateEndpoint": { "value": true },
+"subnetId": { "value": "/subscriptions/<subId>/resourceGroups/<rg>/providers/Microsoft.Network/virtualNetworks/<vnet>/subnets/<subnet>" },
+"logAnalyticsId": { "value": "/subscriptions/<subId>/resourceGroups/<rg>/providers/Microsoft.OperationalInsights/workspaces/<law>" },
+"deployments": {
+"value": [
+{
+"deploymentName": "gpt4o",
+"modelName": "gpt-4o",
+"modelVersion": "2024-05-13",
+"capacity": 10
+}
+]
+}
+}
+}

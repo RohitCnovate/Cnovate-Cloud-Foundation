@@ -36,7 +36,7 @@
           "enableCMK": true,
 
 
-          "keyVaultUri": "https://kvidiscoverydeveastus05.vault.azure.net/",
+          "keyVaultUri": "https://kvidiscoverydeveastus09.vault.azure.net/",
           "keyName": "keyVaultModule.outputs.keyName",
           
           "keyVersion": "keyVaultModule.outputs.keyVersion",
@@ -53,7 +53,7 @@
       ]
     },
 
-    "keyVaultName": { "value": "kvidiscoverydeveastus05" },
+    "keyVaultName": { "value": "kvidiscoverydeveastus09" },
     "cmkKeyName": { "value": "cmk-data-key" },
     "keyVaultSku": { "value": "standard" },
     "keyVaultObjectId": {

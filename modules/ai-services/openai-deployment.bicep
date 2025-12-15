@@ -1,22 +1,27 @@
-// @description('Azure OpenAI account name')
-// param aiAccountName string
+param openAiAccountName string
+param deploymentName string
+param modelName string
+param modelVersion string
+param capacity int
 
-// @description('Model name such as gpt-4o, gpt-4-turbo, text-embedding-3-large')
-// param modelName string
 
-// @description('Deployment name for the model')
-// param deploymentName string
+resource openAi 'Microsoft.CognitiveServices/accounts@2023-05-01' existing = {
+name: openAiAccountName
+}
 
-// resource modelDeployment 'Microsoft.CognitiveServices/accounts/deployments@2023-10-01' = {
-//   name: '${aiAccountName}/${deploymentName}'
-//   properties: {
-//     model: {
-//       format: 'OpenAI'
-//       name: modelName
-//       version: '1'   // optional
-//     }
-//     sku: {
-//       name: 'Standard'
-//     }
-//   }
-// }
+
+resource deployment 'Microsoft.CognitiveServices/accounts/deployments@2023-05-01' = {
+name: deploymentName
+parent: openAi
+properties: {
+model: {
+format: 'OpenAI'
+name: modelName
+version: modelVersion
+}
+scaleSettings: {
+scaleType: 'Standard'
+capacity: capacity
+}
+}
+}

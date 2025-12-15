@@ -51,4 +51,40 @@ module functionAppModule './modules/compute/functionapp.bicep' = {
   }
 }
 
+targetScope = 'resourceGroup'
+
+
+param location string
+param openAiName string
+param enablePrivateEndpoint bool = false
+param subnetId string = ''
+param logAnalyticsId string = ''
+param deployments array
+
+
+module openaiAccount './modules/openai-account.bicep' = {
+name: 'openai-account'
+params: {
+name: openAiName
+location: location
+enablePrivateEndpoint: enablePrivateEndpoint
+subnetId: subnetId
+logAnalyticsId: logAnalyticsId
+}
+}
+
+
+module openaiDeployments './modules/openai-deployment.bicep' = [
+for d in deployments: {
+name: 'deploy-${d.deploymentName}'
+params: {
+openAiAccountName: openAiName
+deploymentName: d.deploymentName
+modelName: d.modelName
+modelVersion: d.modelVersion
+capacity: d.capacity
+}
+dependsOn: [ openaiAccount ]
+}
+]
 
