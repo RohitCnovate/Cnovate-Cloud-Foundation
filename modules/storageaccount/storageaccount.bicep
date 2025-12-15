@@ -1,3 +1,85 @@
+// param project string
+// param env string
+// param region string
+// param instance string
+// param location string
+// param skuName string
+// param kind string
+// param accessTier string
+// param minimumTlsVersion string
+// param enableCMK bool
+// param keyVaultUri string        // Expecting: https://<vaultname>.vault.azure.net/
+// param keyName string
+// param keyVersion string
+// param userAssignedIdentityId string
+// param tags object = {}
+
+
+// // ------------------------
+// // Generate storage account name using convention
+
+// var storageName = ('stg${project}${env}${region}${instance}')
+// var storageNameTrimmed = substring(storageName, 0, 24)
+
+// resource stg 'Microsoft.Storage/storageAccounts@2025-06-01' = {
+//   name: storageNameTrimmed
+//   location: location
+//   kind: kind
+//   tags: tags
+
+//   sku: {
+//     name: skuName
+//   }
+
+//   identity: enableCMK ? {
+//     type: 'UserAssigned'
+//     userAssignedIdentities: {
+//       '${userAssignedIdentityId}': {}
+//     }
+//   } : {
+//     type: 'None'
+//   }
+
+//   properties: {
+//     accessTier: accessTier
+//     minimumTlsVersion: minimumTlsVersion
+//     supportsHttpsTrafficOnly: true
+//     allowBlobPublicAccess: false
+//     publicNetworkAccess: 'Enabled'
+
+//     encryption: {
+//       keySource: enableCMK ? 'Microsoft.Keyvault' : 'Microsoft.Storage'
+//       requireInfrastructureEncryption: true
+
+//       identity: enableCMK ? {
+//         userAssignedIdentity: userAssignedIdentityId
+//       } : null
+
+//       keyvaultproperties: enableCMK ? {
+//         keyname: keyName        // Correct casing
+//         keyversion: keyVersion  // Correct version
+//         keyvaulturi: keyVaultUri // Should be only vault base URI
+//       } : null
+
+//       services: {
+//         blob: {
+//           enabled: true
+//           keyType: 'Account'
+//         }
+//         file: {
+//           enabled: true
+//           keyType: 'Account'
+//         }
+//       }
+//     }
+//   }
+// }
+
+// // ------------------------
+// // Outputs
+// output id string = stg.id
+// output storageName string = storageNameTrimmed
+// output storageLocation string = location
 
 param project string
 param env string
@@ -15,15 +97,11 @@ param keyVersion string
 param userAssignedIdentityId string
 param tags object = {}
 
-
-// ------------------------
-// Generate storage account name using convention
-
-var storageName = ('stg${project}${env}${region}${instance}')
-var storageNameTrimmed = substring(storageName, 0, 24)
+// Storage account name (trimmed to 24 chars)
+var storageName = substring('stg${project}${env}${region}${instance}', 0, 24)
 
 resource stg 'Microsoft.Storage/storageAccounts@2025-06-01' = {
-  name: storageNameTrimmed
+  name: storageName
   location: location
   kind: kind
   tags: tags
@@ -51,30 +129,26 @@ resource stg 'Microsoft.Storage/storageAccounts@2025-06-01' = {
     encryption: {
       keySource: enableCMK ? 'Microsoft.Keyvault' : 'Microsoft.Storage'
       requireInfrastructureEncryption: true
+
       identity: enableCMK ? {
         userAssignedIdentity: userAssignedIdentityId
       } : null
+
       keyvaultproperties: enableCMK ? {
         keyname: keyName
         keyversion: keyVersion
         keyvaulturi: keyVaultUri
       } : null
+
       services: {
-        blob: {
-          enabled: true
-          keyType: 'Account'
-        }
-        file: {
-          enabled: true
-          keyType: 'Account'
-        }
+        blob: { enabled: true, keyType: 'Account' }
+        file: { enabled: true, keyType: 'Account' }
       }
     }
   }
 }
 
-// ------------------------
 // Outputs
 output id string = stg.id
-output storageName string = storageNameTrimmed
+output storageName string = storageName
 output storageLocation string = location

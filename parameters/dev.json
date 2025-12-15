@@ -35,9 +35,12 @@
           "minimumTlsVersion": "TLS1_2",
           "enableCMK": true,
 
+
           "keyVaultUri": "https://kvidiscoverydeveastus05.vault.azure.net/",
-          "keyName": "cmk-data-key",
-          "keyVersion": "",
+          "keyName": "keyVaultModule.outputs.keyName",
+          
+          "keyVersion": "keyVaultModule.outputs.keyVersion",
+      "userAssignedIdentityId": "uamiModule[stg.uamiIndex].outputs.uamiId",
 
           "resourceGroupIndex": 0,
           "uamiIndex": 0,
@@ -66,7 +69,7 @@
           "region": "eastus",
 
           "instance": "03",
- "uamiObjectId": "c8e7786f-8f35-4a64-aafe-051a9b8",
+ "uamiObjectId": "c8e7786f-8f35-4a64-aafe-051a9b8001c0",
           "resourceType": "storage",
           "resourceGroupIndex": 0
         }

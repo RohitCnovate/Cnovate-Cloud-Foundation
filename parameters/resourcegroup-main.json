@@ -1,0 +1,16 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "location": { "value": "eastus" },
+    "resourceToken": { "value": "test001" },
+    "appName": { "value": "func-catalogsearch1-prod-01" },
+    "maximumInstanceCount": { "value": 40 },
+    "instanceMemoryMB": { "value": 512 },
+    "functionAppRuntime": { "value": "python" },
+    "functionAppRuntimeVersion": { "value": "3.11" },
+    "deploymentStorageContainerName": { "value": "deployments" },
+
+    "storageAccountName": { "value": "st873" },
+    "userAssignedIdentityName": { "value": "storage-uami-dev" },
+    "applicationInsightsName": { "value": "app catalogsearch1-ai-prod-01" } }}
