@@ -2,22 +2,58 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "location": { "value": "eastus" },
-    "openAiName": { "value": "openai-prod-05" },
-    "enablePrivateEndpoint": { "value": true },
-    "subnetId": { "value": "/subscriptions/<subId>/resourceGroups/<rg>/providers/Microsoft.Network/virtualNetworks/<vnet>/subnets/<subnet>" },
-    "deployments": {
+    "uamiName": {
+      "value": "uami-idiscovery-dev-eastus-01"
+    },
+    "uamiObjectId": {
+      "value": "e851ac43-fc4c-46ce-beea-eeb7c4460273"
+    },
+    "keyVaultName": {
+      "value": "kvidiscoverydeveastus11"
+    },
+    "cmkKeyName": {
+      "value": "cmk-data-key"
+    },
+    "storageName": {
+      "value": "stidiscoverydeveastus02"
+    },
+    "openAiName": {
+      "value": "openai-idiscovery-dev-eastus"
+    },
+    "openAiDeployments": {
       "value": [
         {
           "deploymentName": "gpt4o",
           "modelName": "gpt-4o",
-          "modelVersion": "2024-05-13",
-          "capacity": 10
+          "modelVersion": "2024-05-13"
         }
       ]
+    },
+    "deployerObjectId": {
+      "value": "e851ac43-fc4c-46ce-beea-eeb7c4460273"
+    },
+    "location": {
+      "value": "eastus"
+    },
+    "webAppName": {
+      "value": "mywebapp-dev"
+    },
+    "sku": {
+      "value": "F1"
+    },
+    "linuxFxVersion": {
+      "value": "node|24-lts"
+    },
+    "repositoryUrl": {
+      "value": "https://github.com/Azure-Samples/nodejs-docs-hello-world"
+    },
+    "branch": {
+      "value": "main"
     }
   }
 }
+
+
 
 
 

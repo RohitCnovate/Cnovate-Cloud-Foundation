@@ -1,0 +1,21 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+
+    "resourceGroups": {
+      "value": [
+        {
+          "app": "idiscovery",
+          "env": "dev",
+          "region": "eastus",
+          "instance": "02",
+          "location": "eastus",
+          "managedBy": "PlatformTeam",
+          "tags": {
+            "app": "idiscovery",
+            "tier": "web",
+            "env": "dev"
+          }
+        }
+      ]}}}

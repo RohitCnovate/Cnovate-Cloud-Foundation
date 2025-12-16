@@ -1,0 +1,105 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.39.26.7824",
+      "templateHash": "11937721102857649208"
+    }
+  },
+  "parameters": {
+    "resourceGroups": {
+      "type": "array"
+    }
+  },
+  "resources": [
+    {
+      "copy": {
+        "name": "rgDeploy",
+        "count": "[length(parameters('resourceGroups'))]"
+      },
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-04-01",
+      "name": "[format('rg-{0}-{1}-{2}-{3}', parameters('resourceGroups')[copyIndex()].app, parameters('resourceGroups')[copyIndex()].env, parameters('resourceGroups')[copyIndex()].region, parameters('resourceGroups')[copyIndex()].instance)]",
+      "location": "[deployment().location]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "name": {
+            "value": "[format('rg-{0}-{1}-{2}-{3}', parameters('resourceGroups')[copyIndex()].app, parameters('resourceGroups')[copyIndex()].env, parameters('resourceGroups')[copyIndex()].region, parameters('resourceGroups')[copyIndex()].instance)]"
+          },
+          "location": {
+            "value": "[parameters('resourceGroups')[copyIndex()].region]"
+          },
+          "tags": {
+            "value": "[parameters('resourceGroups')[copyIndex()].tags]"
+          },
+          "managedBy": "[if(empty(parameters('resourceGroups')[copyIndex()].managedBy), createObject('value', null()), createObject('value', parameters('resourceGroups')[copyIndex()].managedBy))]"
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.39.26.7824",
+              "templateHash": "11887868934809574530"
+            }
+          },
+          "parameters": {
+            "name": {
+              "type": "string"
+            },
+            "location": {
+              "type": "string"
+            },
+            "tags": {
+              "type": "object",
+              "defaultValue": {}
+            },
+            "managedBy": {
+              "type": "string",
+              "defaultValue": ""
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Resources/resourceGroups",
+              "apiVersion": "2021-04-01",
+              "name": "[parameters('name')]",
+              "location": "[parameters('location')]",
+              "tags": "[parameters('tags')]",
+              "managedBy": "[if(empty(parameters('managedBy')), null(), parameters('managedBy'))]"
+            }
+          ],
+          "outputs": {
+            "name": {
+              "type": "string",
+              "value": "[parameters('name')]"
+            },
+            "location": {
+              "type": "string",
+              "value": "[reference(subscriptionResourceId('Microsoft.Resources/resourceGroups', parameters('name')), '2021-04-01', 'full').location]"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "outputs": {
+    "createdResourceGroups": {
+      "type": "array",
+      "copy": {
+        "count": "[length(parameters('resourceGroups'))]",
+        "input": {
+          "name": "[format('rg-{0}-{1}-{2}-{3}', parameters('resourceGroups')[copyIndex()].app, parameters('resourceGroups')[copyIndex()].env, parameters('resourceGroups')[copyIndex()].region, parameters('resourceGroups')[copyIndex()].instance)]",
+          "location": "[parameters('resourceGroups')[copyIndex()].location]"
+        }
+      }
+    }
+  }
+}

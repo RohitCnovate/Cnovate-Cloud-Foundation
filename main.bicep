@@ -118,3 +118,6 @@ output cmkKeyId string = keyVaultModule.outputs.keyId
 
 output uamiId string = uamiModule[0].outputs.uamiId
 output uamiPrincipalId string = uamiModule[0].outputs.uamiPrincipalId
+
+
+

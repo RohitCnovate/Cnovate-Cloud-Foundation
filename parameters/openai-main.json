@@ -2,10 +2,24 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "location": { "value": "eastus" },
-    "openAiName": { "value": "openai-prod-05" },
-    "enablePrivateEndpoint": { "value": false }, 
-    "subnetId": { "value": "" },
+    "location": {
+      "value": "eastus"
+    },
+    "openAiName": {
+      "value": "openai-prod-05"
+    },
+    "enablePrivateEndpoint": {
+      "value": false
+    },
+    "subnetId": {
+      "value": ""
+    },
+    "keyName": {
+      "value": "cmk-data-key"
+    },
+    "keyVersion": {
+      "value": ""
+    },
     "deployments": {
       "value": [
         {
@@ -17,6 +31,4 @@
     }
   }
 }
-
-
 

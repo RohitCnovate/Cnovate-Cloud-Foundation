@@ -1,13 +1,16 @@
 targetScope = 'resourceGroup'
 
-// OpenAI parameters
 param location string = resourceGroup().location
 param openAiName string
 param enablePrivateEndpoint bool = false
 param subnetId string = ''
+
+// CMK params
+param keyName string
+param keyVersion string = ''
+
 param deployments array
 
-// Deploy OpenAI Account
 module openaiAccount './modules/ai-services/openai-account.bicep' = {
   name: 'openai-account'
   params: {
@@ -15,10 +18,11 @@ module openaiAccount './modules/ai-services/openai-account.bicep' = {
     location: location
     enablePrivateEndpoint: enablePrivateEndpoint
     subnetId: subnetId
+    keyName: keyName
+    keyVersion: keyVersion
   }
 }
 
-// Deploy OpenAI Deployments
 module openaiDeployments './modules/ai-services/openai-deployment.bicep' = [
   for d in deployments: {
     name: 'deploy-${d.deploymentName}'
@@ -33,5 +37,3 @@ module openaiDeployments './modules/ai-services/openai-deployment.bicep' = [
     ]
   }
 ]
-
-
