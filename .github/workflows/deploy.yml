@@ -46,10 +46,10 @@ jobs:
 
       - name: What-If Deployment
         run: |
-          az deployment sub what-if \ \
-            --location eastus \
-            --template-file ./resourcegroup1-main.bicep
-            --parameters @parameters/resourcegroup1.main.json
+          az deployment group what-if \
+          --resource-group rg-idiscovery-dev-eastus-02 \
+          --template-file ./resourcegroup1-main.bicep \
+          --parameters @parameters/resourcegroup1.main.json
 
   securityScan:
     name: Security Scan (Checkov)
