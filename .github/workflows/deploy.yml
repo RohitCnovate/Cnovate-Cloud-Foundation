@@ -49,7 +49,7 @@ jobs:
           az deployment sub what-if \
             --location eastus \
             --template-file ./subscription-main.bicep \
-            --parameters @$PARAM_FILE
+            --parameters @parameters/subscription-main.json
 
   securityScan:
     name: Security Scan (Checkov)
@@ -117,7 +117,7 @@ jobs:
             --name mystack-${{ github.ref_name }} \
             --location eastus \
             --template-file ./subscription-main.bicep\
-            --parameters @parameters/${{ github.ref_name }}.json \
+            --parameters @parameters/subscription-main.json \
             --deny-settings-mode None \
             --action-on-unmanage detachAll
 
