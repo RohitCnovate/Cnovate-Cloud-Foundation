@@ -38,17 +38,17 @@ jobs:
   
       - name: Lint Bicep Templates
         run: |
-          az bicep lint --file ./main.bicep
+          az bicep lint --file ./subscription-main.bicep
 
 
       - name: Build Bicep File
-        run: az bicep build --file ./main.bicep
+        run: az bicep build --file ./subscription-main.bicep
 
       - name: What-If Deployment
         run: |
           az deployment sub what-if \
             --location eastus \
-            --template-file ./main.bicep \
+            --template-file ./subscription-main.bicep \
             --parameters @$PARAM_FILE
 
   securityScan:
@@ -67,7 +67,7 @@ jobs:
       - name: Run Checkov Scan
         uses: bridgecrewio/checkov-action@v12.1347.0
         with:
-          directory: ./main.bicep
+          directory: ./subscription-main.bicep
           framework: bicep
           soft_fail: false
           output_format: sarif
@@ -116,7 +116,7 @@ jobs:
           az stack sub create \
             --name mystack-${{ github.ref_name }} \
             --location eastus \
-            --template-file ./main.bicep \
+            --template-file ./subscription-main.bicep\
             --parameters @parameters/${{ github.ref_name }}.json \
             --deny-settings-mode None \
             --action-on-unmanage detachAll
