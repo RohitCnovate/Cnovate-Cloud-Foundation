@@ -1,51 +1,3 @@
-// targetScope = 'resourceGroup'
-
-// // OpenAI parameters
-// param location string = resourceGroup().location
-// param openAiName string
-// param enablePrivateEndpoint bool = false
-// param subnetId string = ''
-// param deployments array
-
-// // Optional: Log Analytics (existing workspace)
-// param logAnalyticsResourceGroup string = ''
-// param logAnalyticsName string = ''
-
-// // ------------------------
-// // Deploy OpenAI Account
-// // ------------------------
-// module openaiAccount './modules/ai-services/openai-account.bicep' = {
-//   name: 'openai-account'
-//   params: {
-//     name: openAiName
-//     location: location
-//     enablePrivateEndpoint: enablePrivateEndpoint
-//     subnetId: subnetId
-//     logAnalyticsResourceGroup: logAnalyticsResourceGroup
-//     logAnalyticsName: logAnalyticsName
-//   }
-// }
-
-// // ------------------------
-// // Deploy OpenAI Deployments
-// // ------------------------
-// module openaiDeployments './modules/ai-services/openai-deployment.bicep' = [
-//   for d in deployments: {
-//     name: 'deploy-${d.deploymentName}'
-//     params: {
-//       openAiAccountName: openAiName
-//       deploymentName: d.deploymentName
-//       modelName: d.modelName
-//       modelVersion: d.modelVersion
-//       capacity: d.capacity
-//     }
-//     dependsOn: [
-//       openaiAccount
-//     ]
-//   }
-// ]
-
-
 targetScope = 'resourceGroup'
 
 param uamiName string
@@ -208,34 +160,61 @@ resource deployments 'Microsoft.CognitiveServices/accounts/deployments@2024-04-0
     }
   }
 ]
+
+
+
 // --------------------------------------------------
-// 7 WebApp Deployments with CMK
+// 7️⃣ App Service Plan + Web App with CMK
 // --------------------------------------------------
 
 param webAppName string
-param sku string = 'F1'
-param linuxFxVersion string
+param sku string 
+param linuxFxVersion string 
 param repositoryUrl string
-param branch string = 'main'
+param branch string
 
-
-// CMK Parameters
-
-param uamiObjectId string
-
-module webAppModule './modules/compute/webapp.bicep' = {
-  name: 'webAppDeployment'
-  scope: resourceGroup()
-  params: {
-    webAppName: webAppName
-    sku: sku
-    linuxFxVersion: linuxFxVersion
-    location: location
-    repositoryUrl: repositoryUrl
-    branch: branch
-
- 
+// 1️⃣ Create a new App Service Plan
+resource appServicePlan 'Microsoft.Web/serverfarms@2022-09-01' = {
+  name: '${webAppName}-plan'
+  location: location
+  kind: 'linux'
+  sku: {
+    name: sku
+    tier: 'Standard'
+  }
+  properties: {
+    reserved: true    //important//
   }
 }
 
-output deployedWebApp string = webAppModule.outputs.webAppNameOutput
+
+
+// 2️⃣ Create Web App with UAMI
+resource webApp 'Microsoft.Web/sites@2021-02-01' = {
+  name: webAppName
+  location: location
+  kind: 'app'
+  identity: {
+    type: 'UserAssigned'
+    userAssignedIdentities: {
+      '${uami.id}': {}  // ← Use UAMI resource ID, not principalId
+    }
+  }
+  properties: {
+    serverFarmId: appServicePlan.id
+    siteConfig: {
+      linuxFxVersion: linuxFxVersion
+      appSettings: [
+        { name: 'REPO_URL', value: repositoryUrl }
+        { name: 'BRANCH', value: branch }
+      ]
+    }
+  }
+  dependsOn: [
+    appServicePlan
+    uami
+  ]
+}
+
+// 3️⃣ Output
+output webAppNameOutput string = webApp.name

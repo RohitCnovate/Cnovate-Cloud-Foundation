@@ -6,13 +6,10 @@ param instanceMemoryMB int
 param functionAppRuntime string
 param functionAppRuntimeVersion string
 param deploymentStorageContainerName string
-
 param userAssignedIdentityId string
 param userAssignedClientId string
-
 param storageAccountName string
 param blobEndpoint string
-
 param appInsightsKey string
 
 resource appServicePlan 'Microsoft.Web/serverfarms@2024-04-01' = {

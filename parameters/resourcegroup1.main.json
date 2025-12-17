@@ -1,0 +1,140 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "location": {
+      "value": "eastus"
+    },
+
+    "tags": {
+      "value": {
+        "Platform": "Cnovate",
+        "Owner": "PlatformTeam",
+        "Environment": "dev"
+      }
+    },
+
+    "uamiConfigs": {
+      "value": [
+        {
+          "project": "idiscovery",
+          "env": "dev",
+          "region": "eastus",
+          "instance": "03",
+          "resourceType": "storage"
+        }
+      ]
+    },
+
+    "keyVaultName": {
+      "value": "kvidiscoverydeveastus18"
+    },
+
+    "cmkKeyName": {
+      "value": "cmk-data-key"
+    },
+
+    "keyVaultSku": {
+      "value": "standard"
+    },
+
+    "keyVaultObjectId": {
+      "value": "e851ac43-fc4c-46ce-beea-eeb7c4460273"
+    },
+
+    "stgConfigs": {
+      "value": [
+        {
+          "project": "idiscovery",
+          "env": "dev",
+          "region": "eastus",
+          "instance": "02",
+          "skuName": "Standard_LRS",
+          "kind": "StorageV2",
+          "accessTier": "Hot",
+          "minimumTlsVersion": "TLS1_2",
+          "enableCMK": true,
+          "uamiIndex": 0
+        }
+      ]
+    },
+
+    "openAiConfigs": {
+      "value": [
+        {
+          "name": "openai-idiscovery-dev-eastus-02",
+          "uamiIndex": 0,
+          "enablePrivateEndpoint": false,
+          "subnetId": ""
+        }
+      ]
+    },
+
+    "openAiDeployments": {
+      "value": [
+        {
+          "openAiName": "openai-idiscovery-dev-eastus-02",
+          "deploymentName": "gpt4o",
+          "modelName": "gpt-4o",
+          "modelVersion": "2024-05-13"
+        }
+      ]
+    },
+
+    "webAppConfigs": {
+      "value": [
+        {
+          "name": "mywebapp-cno-new",
+          "sku": "S1",
+          "linuxFxVersion": "NODE|22-lts",
+          "repositoryUrl": "https://github.com/org/repo",
+          "branch": "main",
+          "uamiIndex": 0,
+          "project": "idiscovery",
+          "env": "dev",
+          "region": "eastus"
+        }
+      ]
+    },
+
+    "logicApps": {
+      "value": [
+        {
+          "name": "la-healthcheck-01",
+          "frequency": "Hour",
+          "interval": 1,
+          "tags": {
+            "App": "HealthCheck"
+          }
+        },
+        {
+          "name": "la-healthcheck-02",
+          "testUri": "https://www.microsoft.com",
+          "frequency": "Day",
+          "interval": 1
+        }
+      ]
+    },
+
+    "functionApps": {
+      "value": [
+        {
+          "appName": "func-catalogsearch1-prod-01",
+          "maximumInstanceCount": 40,
+          "instanceMemoryMB": 512,
+          "functionAppRuntime": "python",
+          "functionAppRuntimeVersion": "3.11",
+          "deploymentStorageContainerName": "deployments"
+        },
+        {
+          "appName": "func-catalogsearch1-worker-prod-01",
+          "maximumInstanceCount": 10,
+          "instanceMemoryMB": 1024,
+          "functionAppRuntime": "node",
+          "functionAppRuntimeVersion": "20",
+          "deploymentStorageContainerName": "deployments"
+        }
+      ]
+    }
+  }
+}

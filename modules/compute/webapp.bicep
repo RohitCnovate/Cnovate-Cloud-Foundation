@@ -4,42 +4,70 @@ param linuxFxVersion string
 param location string
 param repositoryUrl string
 param branch string
-param keyVaultName string
-param cmkKeyName string
-param uamiObjectId string
+param uamiId string   // FULL resource ID of UAMI
+param tags object
 
-// Reference existing Key Vault
-resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
-  name: keyVaultName
+/* =====================
+   APP SERVICE PLAN
+   ===================== */
+resource appServicePlan 'Microsoft.Web/serverfarms@2022-09-01' = {
+  name: '${webAppName}-plan'
+  location: location
+  kind: 'linux'
+  sku: {
+    name: sku
+    tier: 'Standard'
+  }
+  properties: {
+    reserved: true
+    
+  }
+   tags: tags 
 }
 
-// Reference existing Key
-resource cmk 'Microsoft.KeyVault/vaults/keys@2023-07-01' existing = {
-  name: cmkKeyName
-  parent: keyVault
-}
-
-// Web App with UAMI and CMK
-resource webApp 'Microsoft.Web/sites@2023-10-01' = {
+/* =====================
+   WEB APP (POLICY COMPLIANT)
+   ===================== */
+resource webApp 'Microsoft.Web/sites@2022-09-01' = {
   name: webAppName
   location: location
-  kind: 'app'
+  kind: 'app,linux'
   identity: {
     type: 'UserAssigned'
     userAssignedIdentities: {
-      '${uamiObjectId}': {}
+      '${uamiId}': {}
     }
   }
   properties: {
-    serverFarmId: '<your-app-service-plan-id>'
+    serverFarmId: appServicePlan.id
+
+    httpsOnly: true                    // ✅ HTTPS only
+    clientCertEnabled: true            // ✅ Client cert required
+
     siteConfig: {
       linuxFxVersion: linuxFxVersion
+
+      http20Enabled: true              // ✅ Latest HTTP version
+      ftpsState: 'FtpsOnly'            // ✅ FTPS only
+      remoteDebuggingEnabled: false    // ✅ No remote debugging
+
+      cors: {
+        allowedOrigins: []             // ✅ No wildcard CORS
+      }
+
+      appSettings: [
+        { name: 'REPO_URL', value: repositoryUrl }
+        { name: 'BRANCH', value: branch }
+        { name: 'WEBSITE_RUN_FROM_PACKAGE', value: '1' }
+      ]
     }
-    keyVaultReferenceIdentity: 'UserAssigned'
-    keyVaultKeyId: cmk.id
   }
+  dependsOn: [
+    appServicePlan
+  ]
 }
 
-// Outputs
+/* =====================
+   OUTPUT
+   ===================== */
 output webAppNameOutput string = webApp.name
-

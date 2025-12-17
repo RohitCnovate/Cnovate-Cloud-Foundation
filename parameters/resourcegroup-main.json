@@ -5,9 +5,6 @@
     "uamiName": {
       "value": "uami-idiscovery-dev-eastus-01"
     },
-    "uamiObjectId": {
-      "value": "e851ac43-fc4c-46ce-beea-eeb7c4460273"
-    },
     "keyVaultName": {
       "value": "kvidiscoverydeveastus11"
     },
@@ -35,15 +32,13 @@
     "location": {
       "value": "eastus"
     },
-    "webAppName": {
-      "value": "mywebapp-dev"
-    },
-    "sku": {
-      "value": "F1"
-    },
-    "linuxFxVersion": {
-      "value": "node|24-lts"
-    },
+    "webAppName": { "value": "mywebapp-cno-new" },
+"sku": { "value": "S1" },
+"linuxFxVersion": {  "value": "NODE:22-lts"  },
+
+
+
+    
     "repositoryUrl": {
       "value": "https://github.com/Azure-Samples/nodejs-docs-hello-world"
     },
@@ -52,6 +47,7 @@
     }
   }
 }
+
 
 
 

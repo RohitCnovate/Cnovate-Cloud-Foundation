@@ -1,5 +1,4 @@
 targetScope = 'subscription'
-
 param resourceGroups array   
 
 module rgDeploy './modules/resourcegroup/rg.bicep' = [

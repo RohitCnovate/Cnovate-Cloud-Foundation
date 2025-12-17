@@ -39,31 +39,48 @@
 // output openAiEndpoint string = openAi.properties.endpoint
 
 
+// --------------------------------------------------
+// PARAMETERS (MODULE CONTRACT)
+// --------------------------------------------------
+// --------------------------------------------------
+// PARAMETERS
+// --------------------------------------------------
 param name string
 param location string
+param tags object
+
+
+param uamiName string
+param keyVaultName string
+param cmkKeyName string
+
 param enablePrivateEndpoint bool = false
 param subnetId string = ''
 
-// 🔐 SAME UAMI (created in same RG or earlier in same deployment)
+// --------------------------------------------------
+// EXISTING RESOURCES
+// --------------------------------------------------
 resource uami 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = {
-  name: 'uami-storageidiscoverydeveastus03'
+  name: uamiName
 }
 
-// 🔐 SAME KEY VAULT
 resource keyVault 'Microsoft.KeyVault/vaults@2023-02-01' existing = {
-  name: 'kvidiscoverydeveastus10'
+  name: keyVaultName
 }
 
-// 🔐 SAME CMK (created in same deployment)
 resource cmk 'Microsoft.KeyVault/vaults/keys@2022-07-01' existing = {
   parent: keyVault
-  name: 'cmk-data-key'
+  name: cmkKeyName
 }
 
+// --------------------------------------------------
+// OPENAI ACCOUNT
+// --------------------------------------------------
 resource openAi 'Microsoft.CognitiveServices/accounts@2024-04-01-preview' = {
   name: name
   location: location
   kind: 'OpenAI'
+  tags: tags
 
   identity: {
     type: 'UserAssigned'
@@ -83,7 +100,7 @@ resource openAi 'Microsoft.CognitiveServices/accounts@2024-04-01-preview' = {
     encryption: {
       keySource: 'Microsoft.KeyVault'
       keyVaultProperties: {
-        keyVaultUri: keyVault.properties.vaultUri
+        keyVaultUri:'https://${keyVault.name}.vault.azure.net/'
         keyName: cmk.name
         keyVersion: last(split(cmk.properties.keyUriWithVersion, '/'))
         identityClientId: uami.properties.clientId
@@ -92,10 +109,14 @@ resource openAi 'Microsoft.CognitiveServices/accounts@2024-04-01-preview' = {
   }
 }
 
-// Optional Private Endpoint
-resource pe 'Microsoft.Network/privateEndpoints@2023-05-01' = if (enablePrivateEndpoint) {
+// --------------------------------------------------
+// OPTIONAL PRIVATE ENDPOINT
+// --------------------------------------------------
+resource openAiPe 'Microsoft.Network/privateEndpoints@2023-05-01' = if (enablePrivateEndpoint) {
   name: '${name}-pe'
   location: location
+  tags: tags
+
   properties: {
     subnet: {
       id: subnetId
@@ -112,6 +133,11 @@ resource pe 'Microsoft.Network/privateEndpoints@2023-05-01' = if (enablePrivateE
   }
 }
 
+// --------------------------------------------------
+// OUTPUTS
+// --------------------------------------------------
 output openAiId string = openAi.id
 output uamiPrincipalId string = uami.properties.principalId
+
+
 
